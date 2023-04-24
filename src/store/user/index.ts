@@ -1,4 +1,4 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { HYDRATE } from 'next-redux-wrapper';
 import axios from 'axios';
 import { Dispatch } from 'redux';
@@ -10,6 +10,8 @@ interface UserState {
   fetchStatus: (typeof STATUSES)[keyof typeof STATUSES];
   addStatus: (typeof STATUSES)[keyof typeof STATUSES];
   deleteStatus: (typeof STATUSES)[keyof typeof STATUSES];
+  openDialog: boolean;
+  dialogData: any;
 }
 
 interface AddUserParams {
@@ -22,6 +24,8 @@ const initialState: UserState = {
   fetchStatus: STATUSES.IDLE,
   addStatus: STATUSES.IDLE,
   deleteStatus: STATUSES.IDLE,
+  openDialog: false,
+  dialogData: null,
 };
 
 // ** Fetch Users
@@ -69,6 +73,17 @@ export const userSlice = createSlice({
   name: 'user',
   initialState,
   reducers: {
+    showDialog: (state, action: PayloadAction<any>) => {
+      state.openDialog = true;
+      state.dialogData = action.payload;
+    },
+    hideDialog: {
+      reducer: (state) => {
+        state.openDialog = false;
+        state.dialogData = null;
+      },
+      prepare: () => ({ payload: undefined }),
+    },
     [HYDRATE]: (state, action) => {
       return {
         ...state,
@@ -109,6 +124,6 @@ export const userSlice = createSlice({
   },
 });
 
-// export const {  } = userSlice.actions;
+export const { showDialog, hideDialog } = userSlice.actions;
 
 export default userSlice.reducer;
